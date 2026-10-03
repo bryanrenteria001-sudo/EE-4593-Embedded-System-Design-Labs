@@ -1,0 +1,53 @@
+//***************************************************************************************
+// MSP430 FR5994
+// Project: LAB1
+// Class: Embedded System Design
+// Name: Bryan Renteria
+// Date: 10/2/26
+//***************************************************************************************
+#include <msp430.h>
+
+float sigmoidFunction(float num) {
+    float SigOrder0, SigOrder1, SigOrder2, SigOrder3;
+    SigOrder0 = 0.5;                                // zero order at zero is f(0) = (1/(1+e^(-0))) = 0.5
+    SigOrder1 = 0.25 * num;          // first order is SigOrder0 * (1 - sigOrder0) = 0.5 (1 - 0.5)= 0.25  --insert into first order--> f'(0) * x = 0.25 * num
+    SigOrder2 = 0;                     // second order is sigOrder1 * (1 - 2*sigOrder0) = 0.25 * (1 - 2* 0.5) = 0  --insert into second order--> f''(0)/2! * x = 0
+    SigOrder3 = -0.0208333 * (num * num * num);     // third order is sigOrder2 - (2*sigOrder1^2) - 2*sigOrder0*sigOrder2 = 0-(2*0.25^2)-(2*0.5*0) = -0.125 --inserted into 3rd order--> f'''(0)/3! * x^3 = -0.125/6 * num^3
+
+    return(SigOrder0 + SigOrder1 + SigOrder2 + SigOrder3);    // returns final polynomial adds all orders together
+}
+float tanhFunction(float num) {
+    float tanhOrder0, tanhOrder1, tanhOrder2, tanhOrder3;
+    tanhOrder0 = 0;
+    tanhOrder1 = 1 * num;
+    tanhOrder2 = 0;
+    tanhOrder3 = -0.33333333 * (num * num * num);
+
+    return(tanhOrder0 + tanhOrder1 + tanhOrder2 + tanhOrder3);
+}
+int main(void) {
+    WDTCTL = WDTPW | WDTHOLD;               // Stop watchdog timer
+    PM5CTL0 &= ~LOCKLPM5;                   // Disable the GPIO power-on default high-impedance mode
+    float a, b, c, d, e;
+    volatile float a_sig_ans, b_sig_ans, c_sig_ans, d_sig_ans, e_sig_ans;
+    volatile float a_tanh_ans, b_tanh_ans, c_tanh_ans, d_tanh_ans, e_tanh_ans;
+    //random picked variables
+    a = .50;
+    b = -0.8;
+    c = .2;
+    d = -0.4;
+    e = .12;
+    //call Taylor Sigmoid Function for each variable
+    a_sig_ans = sigmoidFunction(a);
+    b_sig_ans = sigmoidFunction(b);
+    c_sig_ans = sigmoidFunction(c);
+    d_sig_ans = sigmoidFunction(d);
+    e_sig_ans = sigmoidFunction(e);
+    //call Taylor Tahn Function for each variable
+    a_tanh_ans = tanhFunction(a);
+    b_tanh_ans = tanhFunction(b);
+    c_tanh_ans = tanhFunction(c);
+    d_tanh_ans = tanhFunction(d);
+    e_tanh_ans = tanhFunction(e);
+    while (1);
+}
